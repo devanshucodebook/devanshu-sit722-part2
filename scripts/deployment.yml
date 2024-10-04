@@ -1,0 +1,37 @@
+# Write Kubernetes Deployment Script
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: book-shop
+  template:
+    metadata:
+      labels:
+        app: book-shop
+    spec:
+      containers: 
+      - name: book-shop
+        image: sha256:67f8a1fc9baca457d3d65bf048334651509a5d0e355ce47410c07586a4dd607e 
+        ports:
+        - containerPort: 8000
+        imagePullPolicy: Never
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://part1_db_7n9j_user:9ah3A03D64BJQ3KdmJC9wHmSpVAd4YPw@dpg-crv3tku8ii6s738kncag-a.oregon-postgres.render.com/part1_db_7n9j"
+---
+# Service to expose FastAPI application
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-shop # Name of the service for FastAPI
+spec:
+  type: LoadBalancer # Type of service to expose it externally
+  ports:
+    - port: 8000 # External port exposed for FastAPI
+      targetPort: 8000 # Port the FastAPI container listens on
+  selector:
+    app: book-shop # Selector to route traffic to the FastAPI pods
